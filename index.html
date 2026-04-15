@@ -1,69 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Survey</title>
 
 <style>
-  :root {
-    --bg: #000;
-    --panel: rgba(18, 18, 18, 0.92);
-    --text: #f5f5f5;
-    --line: rgba(255, 255, 255, 0.12);
-    --blue: #1a73e8;
-    --yellow: #fbbc04;
+  * {
+    box-sizing: border-box;
   }
-
-  * { box-sizing: border-box; }
 
   body {
     margin: 0;
-    min-height: 100vh;
-    background: linear-gradient(180deg, #050505 0%, #000 100%);
-    color: var(--text);
+    background: #000;
+    color: #fff;
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100vh;
     text-align: center;
     padding: 20px;
   }
 
   .container {
-    width: 100%;
-    max-width: 560px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    padding: 36px 26px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    width: 90%;
+    max-width: 520px;
   }
 
   .question {
-    font-size: 32px;
-    margin-bottom: 28px;
-    min-height: 80px;
+    font-size: 34px;
+    line-height: 1.35;
+    margin-bottom: 30px;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .notice {
-    font-size: 22px;
-    margin-bottom: 28px;
-  }
-
-  #a {
+  #answers {
     display: grid;
     gap: 10px;
   }
 
   button, input {
     width: 100%;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.14);
-    color: var(--text);
-    padding: 13px;
-    border-radius: 14px;
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
     font-size: 15px;
+    outline: none;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:hover, input:focus {
+    background: #1a1a1a;
   }
 
   .warning {
@@ -72,8 +68,9 @@
     display: none;
     justify-content: center;
     align-items: center;
-    background: rgba(0,0,0,0.65);
+    background: rgba(0, 0, 0, 0.68);
     z-index: 999;
+    padding: 20px;
   }
 
   .warning.show {
@@ -81,29 +78,81 @@
   }
 
   .warning-box {
-    width: min(92%, 520px);
+    width: min(92%, 560px);
     background: #fff;
     color: #111;
     border-radius: 18px;
     padding: 22px;
     display: flex;
     gap: 14px;
+    text-align: left;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
   }
 
   .warning-icon {
-    background: #111;
-    color: var(--yellow);
-    width: 42px;
-    height: 42px;
+    font-size: 28px;
+    line-height: 1;
+    color: #fbbc04;
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
+
+  .warning-text h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .warning-text p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #222;
+  }
+
+  .warning-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .warning-actions button {
+    width: auto;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #d0d0d0;
+    background: #fff;
+    color: #111;
+  }
+
+  .warning-actions button:hover {
+    background: #f4f4f4;
   }
 
   .warning-actions button.selected {
-    background: var(--blue);
+    background: #1a73e8;
     color: #fff;
+    border-color: #1a73e8;
+  }
+
+  .result-screen {
+    width: 100%;
+    max-width: 520px;
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+  }
+
+  .result-screen h2 {
+    margin: 0;
+    font-size: 28px;
+  }
+
+  .result-screen p {
+    margin: 0;
+    color: #bbb;
   }
 </style>
 </head>
@@ -112,18 +161,26 @@
 
 <div class="container" id="screen">
   <div class="question" id="q"></div>
-  <div id="a"></div>
+  <div id="answers"></div>
 </div>
 
 <div class="warning" id="warn">
   <div class="warning-box">
     <div class="warning-icon">⚠</div>
-    <div>
-      <h2>Security warning</h2>
+    <div class="warning-text">
+      <h3>Security warning</h3>
       <p id="warnText"></p>
+      <p>
+        This site may contain content that feels personal or unsettling.
+        Read carefully before continuing, and make sure you understand what you are agreeing to.
+        Some pages try to move too fast and can hide important details if you do not slow down.
+      </p>
+      <p>
+        You can continue reading if you trust the page, or leave now if anything feels wrong.
+      </p>
       <div class="warning-actions">
-        <button id="continueBtn" onclick="chooseWarn('continue')">Continue reading</button>
-        <button id="leaveBtn" onclick="chooseWarn('leave')">Abandon site</button>
+        <button id="cBtn" onclick="choose('c')">Continue reading</button>
+        <button id="lBtn" onclick="choose('l')">Abandon site</button>
       </div>
     </div>
   </div>
@@ -131,78 +188,134 @@
 
 <script>
 const questions = [
-  { type:"input", q:"How old are you?" },
-  { type:"input", q:"What is your favorite color?" },
-  { q:"Do you prefer day or night?", c:["Day","Night","Both"] },
-  { q:"Do you like being alone or with others?", c:["Alone","With others","Depends"] },
-  { q:"Do you have a song you’ve been listening to a lot lately?", c:["Yes","Sometimes","No"] },
-  { q:"Do you usually fall asleep quickly or does it take time?", c:["Quickly","It takes time","Depends"] },
-  { q:"Have you ever woken up in the middle of the night for no reason?", c:["Yes","Sometimes","No"] },
-  { q:"Do you prefer silence or having background noise?", c:["Silence","Noise","Either"] },
-  { q:"Have you ever felt like someone was watching you?", c:["Yes","Maybe","No"] },
-  { q:"Do you feel uncomfortable sleeping with your door open?", c:["Yes","Sometimes","No"] },
-  { q:"What would you do if you heard a noise in your house?", c:["Check","Ignore","Call someone"] },
-  { q:"Would your phone turning on scare you?", c:["Yes","A bit","No"] },
-  { q:"Have you seen something strange?", c:["Yes","Maybe","No"] },
-  { q:"Would you stay calm if called?", c:["Yes","No","Not sure"] },
-  { q:"Do you sometimes look behind you?", c:["Yes","Sometimes","No"] },
-  { q:"Does it make you uncomfortable to think someone might be reading this with you?", c:["Yes","A little","No"] },
-  { q:"Did you check your surroundings before continuing?", c:["Yes","No","Maybe"] },
-  { q:"Are you completely sure you are alone?", c:["Yes","Maybe","No"] },
-  { type:"notice", q:"Before finishing..." },
-  { q:"Where are you answering this from?", c:["Home","School","Other"] }
+  { type: "input", q: "How old are you?" },
+  { type: "input", q: "What is your favorite color?" },
+  { q: "Do you prefer day or night?", c: ["Day", "Night", "Both"] },
+  { q: "Do you like being alone or with others?", c: ["Alone", "With others", "Depends"] },
+  { q: "Do you have a song you’ve been listening to a lot lately?", c: ["Yes", "Sometimes", "No"] },
+  { q: "Do you usually fall asleep quickly or does it take time?", c: ["Quickly", "It takes time", "Depends"] },
+  { q: "Have you ever woken up in the middle of the night for no reason?", c: ["Yes", "Sometimes", "No"] },
+  { q: "Do you prefer silence or having background noise?", c: ["Silence", "Background noise", "Either"] },
+  { q: "Have you ever felt like someone was watching you when no one was there?", c: ["Yes", "Maybe", "No"] },
+  { q: "Do you feel uncomfortable sleeping with your door open?", c: ["Yes", "Sometimes", "No"] },
+  { q: "What would you do if you heard a noise in your house and you know everyone is asleep?", c: ["Check", "Ignore", "Call someone"] },
+  { q: "Would you feel nervous if your phone turned on by itself?", c: ["Yes", "A bit", "No"] },
+  { q: "Have you ever seen something you couldn’t explain afterward?", c: ["Yes", "Maybe", "No"] },
+  { q: "Would you feel calm if someone said your name right now?", c: ["Yes", "No", "Not sure"] },
+  { q: "Do you sometimes look behind you for no clear reason?", c: ["Yes", "Sometimes", "No"] },
+  { q: "What would you do if one of your answers suddenly changed?", c: ["Check", "Ignore", "Leave"] },
+  { q: "Does it make you uncomfortable to think someone might be reading this with you?", c: ["Yes", "A little", "No"] },
+  { q: "Did you check your surroundings before continuing?", c: ["Yes", "No", "Maybe"] },
+  { q: "Are you completely sure you are alone?", c: ["Yes", "Maybe", "No"] },
+  { type: "notice", q: "Before finishing…" },
+  { q: "Where are you answering this from?", c: ["Home", "School", "Other"] }
 ];
 
 let i = 0;
+let typing = null;
 
-function typeText(text) {
+function type(text, className = "question") {
+  clearInterval(typing);
   const el = document.getElementById("q");
+  el.className = className;
   el.innerHTML = "";
   let n = 0;
-  const t = setInterval(() => {
-    el.innerHTML += text[n];
+
+  typing = setInterval(() => {
+    el.innerHTML += text[n] || "";
     n++;
-    if (n >= text.length) clearInterval(t);
+    if (n >= text.length) clearInterval(typing);
   }, 20);
 }
 
 function show() {
   if (i >= questions.length) {
     document.getElementById("screen").innerHTML = `
-      <h2>Analysis complete.</h2>
-      <button onclick="goAway()">View results</button>
+      <div class="result-screen">
+        <h2>Analysis complete.</h2>
+        <p>Your results are ready.</p>
+        <button onclick="goAway()">Results</button>
+      </div>
     `;
     return;
   }
 
-  let q = questions[i];
-  typeText(q.q);
+  const q = questions[i];
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
 
-  let a = document.getElementById("a");
-  a.innerHTML = "";
-
-  if (q.type === "input") {
-    let input = document.createElement("input");
-    input.onkeydown = e => { if (e.key === "Enter") next(); };
-    a.appendChild(input);
-  } else if (q.type === "notice") {
-    let b = document.createElement("button");
-    b.innerText = "Continue";
-    b.onclick = next;
-    a.appendChild(b);
+  if (q.type === "notice") {
+    type(q.q, "question");
+    const btn = document.createElement("button");
+    btn.innerText = "Continue";
+    btn.onclick = next;
+    answers.appendChild(btn);
+  } else if (q.type === "input") {
+    type(q.q, "question");
+    const input = document.createElement("input");
+    input.placeholder = "Press Enter...";
+    input.onkeydown = e => {
+      if (e.key === "Enter" && input.value.trim() !== "") next();
+    };
+    answers.appendChild(input);
+    input.focus();
   } else {
+    type(q.q, "question");
     q.c.forEach(opt => {
-      let b = document.createElement("button");
+      const b = document.createElement("button");
       b.innerText = opt;
       b.onclick = next;
-      a.appendChild(b);
+      answers.appendChild(b);
     });
+  }
+
+  if (i === 14) {
+    warn("This page might be trying to keep you engaged longer than expected.");
+  }
+  if (i === 17) {
+    warn("Suspicious behavior detected. You may leave if you feel uncomfortable.");
+  }
+  if (i === 18) {
+    warn("Final questions. Decide carefully if you want to continue.");
   }
 }
 
 function next() {
   i++;
   show();
+}
+
+function warn(text) {
+  document.getElementById("warnText").innerText = text;
+  document.getElementById("warn").classList.add("show");
+  resetWarningButtons();
+}
+
+function choose(x) {
+  const c = document.getElementById("cBtn");
+  const l = document.getElementById("lBtn");
+
+  c.classList.remove("selected");
+  l.classList.remove("selected");
+
+  if (x === "c") {
+    c.classList.add("selected");
+    setTimeout(() => closeWarn(), 200);
+  } else {
+    l.classList.add("selected");
+    setTimeout(() => {
+      window.location.href = "https://www.google.com";
+    }, 200);
+  }
+}
+
+function resetWarningButtons() {
+  document.getElementById("cBtn").classList.remove("selected");
+  document.getElementById("lBtn").classList.remove("selected");
+}
+
+function closeWarn() {
+  document.getElementById("warn").classList.remove("show");
 }
 
 function goAway() {
