@@ -47,6 +47,14 @@
     min-height: 80px;
   }
 
+  .notice {
+    font-size: 22px;
+    line-height: 1.4;
+    margin-bottom: 28px;
+    min-height: 80px;
+    color: #fff;
+  }
+
   #a {
     display: grid;
     gap: 10px;
@@ -173,8 +181,8 @@
         Read carefully before you continue or answer.
       </p>
       <div class="warning-actions">
-        <button id="continueBtn" class="continue-btn" onclick="chooseWarn('continue')">Continue reading</button>
-        <button id="leaveBtn" class="leave-btn" onclick="chooseWarn('leave')">Leave site</button>
+        <button id="continueBtn" onclick="chooseWarn('continue')">Continue reading</button>
+        <button id="leaveBtn" onclick="chooseWarn('leave')">Abandon site</button>
       </div>
     </div>
   </div>
@@ -185,10 +193,11 @@ const questions = [
   { type: "input", q: "How old are you?" },
   { type: "input", q: "What is your favorite color?" },
   { q: "Do you prefer day or night?", c: ["Day", "Night", "Both"] },
-  { q: "Do you prefer being alone or with others?", c: ["Alone", "With others", "Depends"] },
+  { q: "Do you like being alone or with others?", c: ["Alone", "With others", "Depends"] },
   { q: "Do you have a song you’ve been listening to a lot lately?", c: ["Yes", "Sometimes", "No"] },
-  { q: "Do you usually fall asleep quickly or does it take time?", c: ["Yes", "Sometimes", "No"] },
-  { q: "Do you prefer silence or having background noise?", c: ["Silence", "Noise", "Either"] },
+  { q: "Do you usually fall asleep quickly or does it take time?", c: ["Quickly", "It takes time", "Depends"] },
+  { q: "Have you ever woken up in the middle of the night for no reason?", c: ["Yes", "Sometimes", "No"] },
+  { q: "Do you prefer silence or having background noise?", c: ["Silence", "Background noise", "Either"] },
   { q: "Have you ever felt like someone was watching you when no one was there?", c: ["Yes", "Maybe", "No"] },
   { q: "Do you feel uncomfortable sleeping with your door open?", c: ["Yes", "Sometimes", "No"] },
   { q: "What would you do if you heard a noise in your house and you know everyone is asleep?", c: ["Check", "Ignore", "Call someone"] },
@@ -196,17 +205,19 @@ const questions = [
   { q: "Have you ever seen something you couldn’t explain afterward?", c: ["Yes", "Maybe", "No"] },
   { q: "Would you feel calm if someone said your name right now?", c: ["Yes", "No", "Not sure"] },
   { q: "Do you sometimes look behind you for no clear reason?", c: ["Yes", "Sometimes", "No"] },
-  { q: "What would you do if one of your answers suddenly changed?", c: [" I don't know", "escape", "delete this"] },
-  { q: "Did you check around you?", c: ["Yes", "No", "Maybe"] },
-  { q: "Are you sure you're alone?", c: ["Yes", "Maybe", "No"] },
-  { q: "Before finishing…
-Where are you answering this from?", c: ["Home", "School", "Other"] }
+  { q: "What would you do if one of your answers suddenly changed?", c: ["Check", "Ignore", "Leave"] },
+  { q: "Does it make you uncomfortable to think someone might be reading this with you?", c: ["Yes", "A little", "No"] },
+  { q: "Did you check your surroundings before continuing?", c: ["Yes", "No", "Maybe"] },
+  { q: "Are you completely sure you are alone?", c: ["Yes", "Maybe", "No"] },
+  { type: "notice", q: "Before finishing..." },
+  { q: "Where are you answering this from?", c: ["Home", "School", "Other"] }
 ];
 
 let i = 0;
 
-function typeText(text) {
+function typeText(text, className = "question") {
   const el = document.getElementById("q");
+  el.className = className;
   el.innerHTML = "";
   let n = 0;
   const t = setInterval(() => {
@@ -227,10 +238,8 @@ function closeWarn() {
 }
 
 function resetWarningButtons() {
-  const continueBtn = document.getElementById("continueBtn");
-  const leaveBtn = document.getElementById("leaveBtn");
-  continueBtn.classList.remove("selected");
-  leaveBtn.classList.remove("selected");
+  document.getElementById("continueBtn").classList.remove("selected");
+  document.getElementById("leaveBtn").classList.remove("selected");
 }
 
 function chooseWarn(action) {
@@ -260,12 +269,17 @@ function show() {
   }
 
   const q = questions[i];
-  typeText(q.q);
-
   const a = document.getElementById("a");
   a.innerHTML = "";
 
-  if (q.type === "input") {
+  if (q.type === "notice") {
+    typeText(q.q, "notice");
+    const b = document.createElement("button");
+    b.innerText = "Continue";
+    b.onclick = next;
+    a.appendChild(b);
+  } else if (q.type === "input") {
+    typeText(q.q, "question");
     const input = document.createElement("input");
     input.placeholder = "Press Enter...";
     input.onkeydown = e => {
@@ -274,6 +288,7 @@ function show() {
     a.appendChild(input);
     input.focus();
   } else {
+    typeText(q.q, "question");
     q.c.forEach(opt => {
       const b = document.createElement("button");
       b.innerText = opt;
@@ -282,21 +297,21 @@ function show() {
     });
   }
 
-  if (i === 13) {
+  if (i === 15) {
     showWarning(
       "Unusual activity was detected on this page. Some elements may try to keep you going without reading everything carefully. Review the content before you continue reading."
     );
   }
 
-  if (i === 15) {
+  if (i === 17) {
     showWarning(
-      "This site may be asking for more attention than necessary. If you do not trust the content, the safest option is to leave the site."
+      "This site may be asking for more attention than necessary. If you do not trust the content, the safest option is to abandon the site."
     );
   }
 
-  if (i === 16) {
+  if (i === 18) {
     showWarning(
-      "Final questions. Before you continue, decide whether to keep reading or leave the site."
+      "Final questions. Before you continue, decide whether to keep reading or abandon the site."
     );
   }
 }
