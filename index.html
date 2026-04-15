@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey</title>
+  <style>
+    :root {
+      --bg: #111;
+      --fg: #fff;
+      --muted: #b8b8b8;
+      --panel: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.14);
+      --accent: #ffffff;
+      --danger: #ff5f5f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow: hidden;
+      transition: background-color .2s ease, color .2s ease;
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .card {
+      width: min(760px, 92vw);
+      padding: 28px 22px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--panel);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
+    .question {
+      font-size: clamp(22px, 3.2vw, 34px);
+      line-height: 1.25;
+      margin: 0 0 22px;
+      min-height: 4.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      margin-left: 2px;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .inputRow {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: min(340px, 86vw);
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--fg);
+      font-size: 16px;
+      outline: none;
+    }
+
+    input::placeholder { color: #b0b0b0; }
+
+    .choiceGroup {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      width: min(620px, 92vw);
+      margin: 0 auto;
+    }
+
+    button.choice, button.primary {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--fg);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+
+    button.choice:hover, button.primary:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.28);
+    }
+
+    button.primary {
+      padding: 13px 18px;
+      font-weight: 700;
+      margin-top: 14px;
+      min-width: 180px;
+    }
+
+    .subtle {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 1.2em;
+    }
+
+    .finalBox {
+      display: none;
+      text-align: center;
+    }
+
+    .finalText {
+      font-size: clamp(20px, 3vw, 30px);
+      margin: 0 0 18px;
+    }
+
+    .warningOverlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15,15,15,.96);
+      z-index: 50;
+    }
+
+    .warningCard {
+      width: min(680px, 94vw);
+      background: #fff;
+      color: #202124;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.5);
+      text-align: left;
+    }
+
+    .warningTop {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 24px solid #fbbc04;
+      position: relative;
+      top: -2px;
+    }
+
+    .warningTitle {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .warningBody {
+      margin: 8px 0 0;
+      color: #3c4043;
+      line-height: 1.5;
+      font-size: 16px;
+    }
+
+    .warningActions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .warnBtn {
+      border: 1px solid #dadce0;
+      background: #fff;
+      color: #1a73e8;
+      border-radius: 999px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .warnBtn.primaryWarn {
+      background: #1a73e8;
+      color: white;
+      border-color: #1a73e8;
+    }
+
+    .tiny {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #5f6368;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" id="mainCard">
+      <p class="question" id="questionText"></p>
+      <div id="answerArea"></div>
+      <div class="subtle" id="hintText"></div>
+    </div>
+
+    <div class="card finalBox" id="finalBox">
+      <p class="finalText" id="finalText">Processing your answers...</p>
+      <button class="primary" id="resultsBtn" style="display:none;">View Results</button>
+      <div class="subtle">Clicking it opens the results page.</div>
+    </div>
+  </div>
+
+  <div class="warningOverlay" id="warningOverlay">
+    <div class="warningCard">
+      <div class="warningTop">
+        <div class="triangle"></div>
+        <h2 class="warningTitle">Deceptive site ahead</h2>
+      </div>
+      <p class="warningBody">
+        Attackers on this site might try to trick you into doing something dangerous, like installing software or revealing personal information.
+      </p>
+      <p class="warningBody">
+        This is a fake warning for the prank. No real danger is happening.
+      </p>
+      <div class="warningActions">
+        <button class="warnBtn" id="backBtn">Go back</button>
+        <button class="warnBtn primaryWarn" id="proceedBtn">Ignore warning</button>
+      </div>
+      <div class="tiny">Browser-style warning, not an actual security alert.</div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { type: "text", q: "How old are you?", placeholder: "Type your age" },
+      { type: "text", q: "What is your favorite color?", placeholder: "Type a color" },
+      { type: "choice", q: "Do you prefer day or night?", choices: ["Day", "Night", "Both"] },
+      { type: "choice", q: "Do you like being alone or with others?", choices: ["Alone", "With others", "Depends"] },
+      { type: "choice", q: "Have you been listening to one song a lot lately?", choices: ["Yes", "A little", "Not really"] },
+      { type: "choice", q: "Do you fall asleep quickly?", choices: ["Yes", "Sometimes", "No"] },
+      { type: "choice", q: "Do you like silence or background noise?", choices: ["Silence", "Noise", "Either"] },
+      { type: "choice", q: "Have you ever felt like someone was watching you?", choices: ["Yes", "Maybe", "No"] },
+      { type: "choice", q: "Do you keep your bedroom door open at night?", choices: ["Yes", "Sometimes", "No"] },
+      { type: "choice", q: "What would you do if you heard a noise in the house?", choices: ["Check it", "Ignore it", "Call someone"] },
+      { type: "choice", q: "Would you get nervous if your phone turned on by itself?", choices: ["Yes", "A bit", "No"] },
+      { type: "choice", q: "Have you ever seen something you could not explain?", choices: ["Yes", "Maybe", "No"] },
+      { type: "choice", q: "Would you stay calm if someone said your name right now?", choices: ["Yes", "Probably not", "Not sure"] },
+      { type: "choice", q: "Do you look behind you for no clear reason sometimes?", choices: ["Yes", "Sometimes", "No"] },
+      { type: "choice", q: "What would you do if one of your answers changed on its own?", choices: ["Close it", "Check again", "Keep going"] },
+      { type: "choice", q: "Does it bother you to think someone could be reading this with you?", choices: ["Yes", "A little", "No"] },
+      { type: "choice", q: "Did you check around you before continuing?", choices: ["Yes", "Not really", "No"] },
+      { type: "choice", q: "Are you completely sure you are alone?", choices: ["Yes", "Maybe", "No"] },
+      { type: "choice", q: "Before finishing, where are you answering from?", choices: ["Home", "School", "Somewhere else"] }
+    ];
+
+    const questionText = document.getElementById("questionText");
+    const answerArea = document.getElementById("answerArea");
+    const hintText = document.getElementById("hintText");
+    const mainCard = document.getElementById("mainCard");
+    const finalBox = document.getElementById("finalBox");
+    const finalText = document.getElementById("finalText");
+    const resultsBtn = document.getElementById("resultsBtn");
+    const warningOverlay = document.getElementById("warningOverlay");
+    const backBtn = document.getElementById("backBtn");
+    const proceedBtn = document.getElementById("proceedBtn");
+
+    let index = 0;
+    let typingTimer = null;
+    let inWarning = false;
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function typeText(text, el, speed = 28) {
+      clearInterval(typingTimer);
+      el.textContent = "";
+      let i = 0;
+      const cursor = document.createElement("span");
+      cursor.className = "cursor";
+      cursor.textContent = "▍";
+      el.appendChild(cursor);
+
+      typingTimer = setInterval(() => {
+        if (i < text.length) {
+          el.insertBefore(document.createTextNode(text.charAt(i)), cursor);
+          i++;
+        } else {
+          clearInterval(typingTimer);
+          cursor.remove();
+        }
+      }, speed);
+    }
+
+    function renderQuestion() {
+      if (index >= questions.length) {
+        showFinal();
+        return;
+      }
+
+      const item = questions[index];
+      hintText.textContent = "";
+      answerArea.innerHTML = "";
+
+      typeText(item.q, questionText, 26);
+
+      if (item.type === "text") {
+        const input = document.createElement("input");
+        input.type = index === 0 ? "number" : "text";
+        input.placeholder = item.placeholder;
+        input.autocomplete = "off";
+        input.spellcheck = false;
+
+        const submit = () => {
+          if (!input.value.trim()) return;
+          advance();
+        };
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") submit();
+        });
+
+        answerArea.innerHTML = "";
+        const row = document.createElement("div");
+        row.className = "inputRow";
+        row.appendChild(input);
+        answerArea.appendChild(row);
+        setTimeout(() => input.focus(), 100);
+        hintText.textContent = "Press Enter to continue.";
+      } else {
+        const group = document.createElement("div");
+        group.className = "choiceGroup";
+
+        item.choices.forEach(choice => {
+          const btn = document.createElement("button");
+          btn.className = "choice";
+          btn.textContent = choice;
+          btn.addEventListener("click", () => advance());
+          group.appendChild(btn);
+        });
+
+        answerArea.appendChild(group);
+        hintText.textContent = "Pick one answer.";
+      }
+
+      if (index === 13 || index === 16) {
+        setTimeout(showWarning, 500);
+      }
+    }
+
+    function advance() {
+      if (inWarning) return;
+      index++;
+      renderQuestion();
+    }
+
+    function showWarning() {
+      if (inWarning) return;
+      inWarning = true;
+      warningOverlay.style.display = "flex";
+    }
+
+    function hideWarningAndContinue() {
+      warningOverlay.style.display = "none";
+      inWarning = false;
+      // small fake glitch/failure after the warning
+      document.body.style.backgroundColor = "#0b0b0b";
+      document.body.style.color = "white";
+      mainCard.style.opacity = "0.95";
+      setTimeout(() => {
+        mainCard.style.opacity = "1";
+      }, 250);
+    }
+
+    function showFinal() {
+      mainCard.style.display = "none";
+      finalBox.style.display = "block";
+
+      setTimeout(() => {
+        finalText.textContent = "Analyzing your answers...";
+      }, 900);
+
+      setTimeout(() => {
+        finalText.textContent = "Done. Click below to view your results.";
+        resultsBtn.style.display = "inline-block";
+      }, 2600);
+    }
+
+    function goToResults() {
+      window.location.href = "https://www.youtube.com/watch?v=oHg5SJYRHA0";
+    }
+
+    backBtn.addEventListener("click", () => {
+      warningOverlay.style.display = "none";
+      inWarning = false;
+      renderQuestion();
+    });
+
+    proceedBtn.addEventListener("click", () => {
+      hideWarningAndContinue();
+    });
+
+    resultsBtn.addEventListener("click", goToResults);
+
+    renderQuestion();
+  </script>
+</body>
+</html>
