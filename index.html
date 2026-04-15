@@ -79,14 +79,14 @@
     transition: width 0.3s;
   }
 
-  /* NUEVAS ADVERTENCIAS */
+  /* ADVERTENCIA TIPO NAVEGADOR */
   .warning {
     position: fixed;
     inset: 0;
     display: none;
     justify-content: center;
     align-items: center;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0.65);
     z-index: 999;
   }
 
@@ -96,46 +96,56 @@
 
   .warning-box {
     width: 90%;
-    max-width: 420px;
-    background: #f5f5f5;
+    max-width: 460px;
+    background: #f3f3f3;
     color: #111;
     border-radius: 18px;
-    border: 1px solid #ddd;
-    padding: 20px;
+    border: 1px solid #d7d7d7;
+    padding: 22px;
     display: flex;
-    gap: 12px;
+    gap: 14px;
     text-align: left;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.4);
   }
 
   .warning-icon {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     background: #111;
-    color: white;
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 20px;
+    flex: 0 0 auto;
   }
 
   .warning-text h2 {
-    margin: 0 0 5px;
-    font-size: 16px;
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 700;
   }
 
   .warning-text p {
-    margin: 0 0 12px;
+    margin: 0 0 14px;
     font-size: 14px;
     color: #444;
+    line-height: 1.45;
   }
 
   .warning-text button {
     width: auto;
-    padding: 8px 14px;
+    padding: 9px 14px;
+    border-radius: 10px;
     background: #111;
-    color: white;
+    color: #fff;
     border: none;
-    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .warning-text button:hover {
+    background: #2a2a2a;
   }
 
 </style>
@@ -149,14 +159,14 @@
   <div id="a"></div>
 </div>
 
-<!-- ADVERTENCIA NUEVA -->
+<!-- ADVERTENCIA -->
 <div class="warning" id="warn">
   <div class="warning-box">
     <div class="warning-icon">⚠</div>
     <div class="warning-text">
-      <h2>Se detectó una advertencia</h2>
-      <p id="warnText">Contenido sensible.</p>
-      <button onclick="closeWarn()">Aceptar</button>
+      <h2>Deceptive site warning</h2>
+      <p id="warnText">This page may try to trick you into sharing personal information.</p>
+      <button onclick="closeWarn()">Back</button>
     </div>
   </div>
 </div>
@@ -241,11 +251,10 @@ function show() {
     });
   }
 
-  // ADVERTENCIAS MÁS REALES AL FINAL
-  if (i === 13) showWarning("Este contenido puede volverse incómodo.");
-  if (i === 15) showWarning("Se recomienda responder con atención.");
-  if (i === 16) showWarning("Últimas preguntas.");
-
+  // ADVERTENCIAS REALISTAS AL FINAL
+  if (i === 13) showWarning("This page might be trying to trick you into sharing information.");
+  if (i === 15) showWarning("Suspicious behavior detected.");
+  if (i === 16) showWarning("Final questions. Proceed carefully.");
 }
 
 function next() {
