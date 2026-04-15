@@ -6,26 +6,41 @@
 
 <style>
 body {
-  background: #111;
-  color: white;
-  font-family: Arial;
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   text-align: center;
-  margin: 0;
 }
 
 .container {
-  max-width: 600px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.question {
+  font-size: 26px;
+  margin-bottom: 30px;
+  min-height: 60px;
 }
 
 button, input {
-  margin: 10px;
-  padding: 10px;
-  font-size: 16px;
+  background: #111;
+  border: 1px solid #333;
+  color: white;
+  padding: 12px;
+  margin: 8px;
+  width: 100%;
+  font-size: 15px;
   cursor: pointer;
+}
+
+button:hover {
+  background: #222;
 }
 
 .warning {
@@ -34,70 +49,70 @@ button, input {
   left: 0;
   width: 100%;
   height: 100%;
-  background: white;
-  color: black;
+  background: black;
+  color: white;
   display: none;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  border: 2px solid #333;
 }
-</style>
 
+</style>
 </head>
+
 <body>
 
 <div class="container">
-  <h2 id="question"></h2>
-  <div id="answers"></div>
+  <div class="question" id="q"></div>
+  <div id="a"></div>
 </div>
 
-<div class="warning" id="warning">
-  <h2>⚠️ This page may be unsafe</h2>
-  <p>This is a simulated warning.</p>
-  <button onclick="closeWarning()">Continue</button>
+<div class="warning" id="warn">
+  <h2>⚠ This page may be unsafe</h2>
+  <p>Proceed carefully.</p>
+  <button onclick="closeWarn()">Continue</button>
 </div>
 
 <script>
 const questions = [
-{q:"How old are you?", type:"input"},
-{q:"What is your favorite color?", type:"input"},
+{type:"input", q:"How old are you?"},
+{type:"input", q:"What is your favorite color?"},
 {q:"Do you prefer day or night?", c:["Day","Night","Both"]},
 {q:"Do you prefer being alone or with others?", c:["Alone","With others","Depends"]},
-{q:"Is there a song you’ve been listening to a lot lately?", c:["Yes","Sometimes","No"]},
+{q:"Is there a song you listen to a lot?", c:["Yes","Sometimes","No"]},
 {q:"Do you fall asleep quickly?", c:["Yes","Sometimes","No"]},
 {q:"Do you like silence or background noise?", c:["Silence","Noise","Either"]},
-{q:"Have you ever felt like someone was watching you?", c:["Yes","Maybe","No"]},
-{q:"Do you feel uncomfortable sleeping with your door open?", c:["Yes","Sometimes","No"]},
+{q:"Have you ever felt watched?", c:["Yes","Maybe","No"]},
+{q:"Do you feel uncomfortable sleeping with the door open?", c:["Yes","Sometimes","No"]},
 {q:"What would you do if you heard a noise at night?", c:["Check","Ignore","Call someone"]},
-{q:"Would you get nervous if your phone turned on by itself?", c:["Yes","A bit","No"]},
-{q:"Have you ever seen something you couldn't explain?", c:["Yes","Maybe","No"]},
-{q:"Would you stay calm if someone said your name right now?", c:["Yes","Probably not","No"]},
-{q:"Do you sometimes look behind you for no reason?", c:["Yes","Sometimes","No"]},
-{q:"What would you do if one answer changed?", c:["Close it","Check again","Keep going"]},
-{q:"Does it bother you that someone could be reading this with you?", c:["Yes","A little","No"]},
-{q:"Did you check your surroundings before continuing?", c:["Yes","Not really","No"]},
-{q:"Are you completely sure you are alone?", c:["Yes","Maybe","No"]},
-{q:"Before finishing… where are you answering from?", c:["Home","School","Somewhere else"]}
+{q:"Would you get nervous if your phone turned on alone?", c:["Yes","A bit","No"]},
+{q:"Have you seen something you can't explain?", c:["Yes","Maybe","No"]},
+{q:"Would you stay calm if someone said your name?", c:["Yes","No","Not sure"]},
+{q:"Do you look behind you sometimes?", c:["Yes","Sometimes","No"]},
+{q:"What if an answer changed?", c:["Close","Check","Ignore"]},
+{q:"Does it bother you someone could read this?", c:["Yes","A little","No"]},
+{q:"Did you check around you?", c:["Yes","No","Maybe"]},
+{q:"Are you sure you're alone?", c:["Yes","Maybe","No"]},
+{q:"Where are you right now?", c:["Home","School","Other"]}
 ];
 
-let index = 0;
-let typing;
+let i = 0;
 
 function type(text) {
-  clearInterval(typing);
-  let i = 0;
-  const el = document.getElementById("question");
+  let el = document.getElementById("q");
   el.innerHTML = "";
+  let n = 0;
 
-  typing = setInterval(() => {
-    el.innerHTML += text[i];
-    i++;
-    if (i >= text.length) clearInterval(typing);
-  }, 25);
+  let t = setInterval(() => {
+    el.innerHTML += text[n];
+    n++;
+    if (n >= text.length) clearInterval(t);
+  }, 20);
 }
 
 function show() {
-  if (index >= questions.length) {
+  if (i >= questions.length) {
     document.body.innerHTML = `
       <h2>Analyzing...</h2>
       <br><br>
@@ -106,11 +121,11 @@ function show() {
     return;
   }
 
-  let q = questions[index];
+  let q = questions[i];
   type(q.q);
 
-  let ans = document.getElementById("answers");
-  ans.innerHTML = "";
+  let a = document.getElementById("a");
+  a.innerHTML = "";
 
   if (q.type === "input") {
     let input = document.createElement("input");
@@ -118,36 +133,35 @@ function show() {
     input.onkeydown = e => {
       if (e.key === "Enter") next();
     };
-    ans.appendChild(input);
+    a.appendChild(input);
     input.focus();
   } else {
     q.c.forEach(opt => {
       let b = document.createElement("button");
       b.innerText = opt;
       b.onclick = next;
-      ans.appendChild(b);
+      a.appendChild(b);
     });
   }
 
-  // 👁️ advertencia en preguntas raras
-  if (index === 8 || index === 14) {
+  if (i === 8 || i === 14) {
     setTimeout(() => {
-      document.getElementById("warning").style.display = "flex";
-    }, 500);
+      document.getElementById("warn").style.display = "flex";
+    }, 400);
   }
 }
 
 function next() {
-  index++;
+  i++;
   show();
 }
 
-function closeWarning() {
-  document.getElementById("warning").style.display = "none";
+function closeWarn() {
+  document.getElementById("warn").style.display = "none";
 }
 
 function go() {
-  window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+  window.location.href = "https://www.youtube.com/watch?v=oHg5SJYRHA0";
 }
 
 show();
